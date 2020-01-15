@@ -1,0 +1,11 @@
+defmodule <%= @module_name %> do
+  use Ecto.Schema
+
+  schema "<%= @schema_name %>" do
+    field :namespace, :string
+    field :key, {:array, :binary}
+    field :value, :binary
+    field :expires_at, <%= @datetime_type %>
+    timestamps(type: <%= @datetime_type %>)
+  end
+end
