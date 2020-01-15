@@ -13,9 +13,8 @@ defmodule PowPostgresStore.MixProject do
         test: [
           # generate the schema to test if schema generation works
           "pow.postgres.gen.schema test/support/schema.ex",
+          "ecto.drop",
           "ecto.create",
-          # rollback all migrations to test if migrations work every time
-          "ecto.rollback -n 1000",
           "ecto.migrate",
           # finally, call the tests
           "test"
@@ -35,7 +34,7 @@ defmodule PowPostgresStore.MixProject do
   defp deps do
     [
       {:pow, "~> 1.0", only: :test},
-      {:ecto_sql, "~> 3.2", only: :test},
+      {:ecto_sql, ">= 3.0.0"},
       {:postgrex, "~> 0.15.3", only: :test}
     ]
   end

@@ -10,5 +10,7 @@ defmodule <%= @module_prefix %>.Repo.Migrations.CreateTablePowStore do
       add :expires_at, <%= @datetime_type %>
       timestamps(type: <%= @datetime_type %>)
     end
+
+    create unique_index("<%= @schema_name %>", [:namespace, :original_key])
   end
 end
