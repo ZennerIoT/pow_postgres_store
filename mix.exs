@@ -33,7 +33,7 @@ defmodule PowPostgresStore.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:pow, "~> 1.0", only: :test},
+      {:pow, ">= 1.0.0"},
       {:ecto_sql, ">= 3.0.0"},
       {:postgrex, "~> 0.15.3", only: :test}
     ]

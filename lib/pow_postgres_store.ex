@@ -29,7 +29,12 @@ defmodule Pow.Postgres.Store do
         ]
       end)
 
-    case repo(config).insert_all(schema, records) do
+    case repo(config).insert_all(
+        schema,
+        records,
+        on_conflict: {:replace, [:value, :expires_at, :updated_at]},
+        conflict_target: [:namespace, :original_key]
+      ) do
       {_rows, _entries} -> :ok
     end
   end
