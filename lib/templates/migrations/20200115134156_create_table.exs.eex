@@ -1,0 +1,14 @@
+defmodule <%= @module_prefix %>.Repo.Migrations.CreateTablePowStore do
+  use Ecto.Migration 
+
+  def change do
+    create table("<%= @schema_name %>") do
+      add :namespace, :text
+      add :key, {:array, :bytea}
+      add :original_key, :bytea
+      add :value, :bytea
+      add :expires_at, <%= @datetime_type %>
+      timestamps(type: <%= @datetime_type %>)
+    end
+  end
+end

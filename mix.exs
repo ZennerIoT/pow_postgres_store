@@ -7,12 +7,13 @@ defmodule PowPostgresStore.MixProject do
       version: "0.1.0",
       elixir: "~> 1.9",
       start_permanent: Mix.env() == :prod,
+      elixirc_paths: elixirc_paths(Mix.env),
       deps: deps(),
       aliases: [
         test: [
           # generate the schema to test if schema generation works
-          "pow.postgres.gen.schema test/schema.ex",
-          "ecto.create --silent",
+          "pow.postgres.gen.schema test/support/schema.ex",
+          "ecto.create",
           # rollback all migrations to test if migrations work every time
           "ecto.rollback -n 1000",
           "ecto.migrate",
@@ -34,7 +35,11 @@ defmodule PowPostgresStore.MixProject do
   defp deps do
     [
       {:pow, "~> 1.0", only: :test},
-      {:ecto_sql, "~> 3.2", only: :test}
+      {:ecto_sql, "~> 3.2", only: :test},
+      {:postgrex, "~> 0.15.3", only: :test}
     ]
   end
+
+  defp elixirc_paths(:test), do: ["lib","test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 end

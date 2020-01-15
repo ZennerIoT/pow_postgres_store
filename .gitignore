@@ -22,7 +22,9 @@ erl_crash.dump
 # Ignore package tarball (built via "mix hex.build").
 pow_postgres_store-*.tar
 
-test/schema.ex
+# ignore generated files from mix test
+test/support/schema.ex
 priv/repo/migrations
 
+# ignore elixir LS cache
 .elixir_ls
