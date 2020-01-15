@@ -4,17 +4,13 @@ defmodule Pow.Postgres.Store do
   alias Pow.Config
   import Ecto.Query
 
-  @config Application.get_env(:pow_postgres_store, __MODULE__, [])
-  @repo Keyword.get(@config, :repo, Pow.Postgres.Repo)
-  @schema Keyword.get(@config, :schema, Pow.Postgres.Schema)
-
   @type key() :: [binary() | atom()] | binary()
   @type record() :: {key(), any()}
   @type key_match() :: [atom() | binary()]
 
   @spec put(Config.t(), record() | [record()]) :: :ok
   def put(config, record) do
-    schema = @schema
+    schema = schema()
     namespace = namespace(config)
     now = DateTime.utc_now() |> DateTime.truncate(:second)
     expires_at = case Config.get(config, :ttl) do
@@ -42,7 +38,7 @@ defmodule Pow.Postgres.Store do
         ]
       end)
 
-    case @repo.insert_all(
+    case repo().insert_all(
         schema,
         records,
         on_conflict: {:replace, [:value, :expires_at, :updated_at]},
@@ -55,11 +51,11 @@ defmodule Pow.Postgres.Store do
   @spec delete(Config.t(), key()) :: :ok
   def delete(config, key) do
     query =
-      @schema
+      schema()
       |> filter_key(key)
       |> filter_namespace(config)
 
-    case @repo.delete_all(query) do
+    case repo().delete_all(query) do
       {_rows, _} ->
         :ok
     end
@@ -68,13 +64,13 @@ defmodule Pow.Postgres.Store do
   @spec get(Config.t(), key()) :: any() | :not_found
   def get(config, key) do
     query =
-      @schema
+      schema()
       |> filter_key(key)
       |> filter_namespace(config)
       |> reject_expired()
       |> select_value()
 
-    case @repo.one(query) do
+    case repo().one(query) do
       nil ->
         :not_found
 
@@ -86,18 +82,30 @@ defmodule Pow.Postgres.Store do
   @spec all(Config.t(), key_match()) :: [record()]
   def all(config, key_match) do
     query =
-      @schema
+      schema()
       |> filter_key_match(key_match)
       |> filter_namespace(config)
       |> reject_expired()
       |> select_record()
 
-    @repo.all(query)
+    repo().all(query)
     |> Enum.map(&decode_record/1)
   end
 
   defp namespace(config) do
     Config.get(config, :namespace, "cache")
+  end
+
+  defp config() do
+    Application.get_env(:pow, __MODULE__, [])
+  end
+
+  defp repo() do
+    Keyword.get(config(), :repo, Pow.Postgres.Repo)
+  end
+
+  defp schema() do
+    Keyword.get(config(), :schema, Pow.Postgres.Schema)
   end
 
   def filter_namespace(query, config) do
