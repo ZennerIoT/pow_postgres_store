@@ -13,6 +13,15 @@ defmodule Pow.Postgres.Store do
     schema = schema(config)
     namespace = namespace(config)
     now = DateTime.utc_now() |> DateTime.truncate(:second)
+    expires_at = case Config.get(config, :ttl) do
+      nil ->
+        nil
+
+      ttl when is_integer(ttl) ->
+        now
+        |> DateTime.add(ttl, :millisecond)
+        |> DateTime.truncate(:second)
+    end
 
     records =
       List.wrap(record)
@@ -23,7 +32,7 @@ defmodule Pow.Postgres.Store do
           key: Enum.map(key, &:erlang.term_to_binary/1),
           original_key: :erlang.term_to_binary(original_key),
           value: :erlang.term_to_binary(value),
-          expires_at: nil,
+          expires_at: expires_at,
           inserted_at: now,
           updated_at: now,
         ]
@@ -58,6 +67,7 @@ defmodule Pow.Postgres.Store do
       schema(config)
       |> filter_key(key)
       |> filter_namespace(config)
+      |> reject_expired()
       |> select_value()
 
     case repo(config).one(query) do
@@ -75,6 +85,7 @@ defmodule Pow.Postgres.Store do
       schema(config)
       |> filter_key_match(key_match)
       |> filter_namespace(config)
+      |> reject_expired()
       |> select_record()
 
     repo(config).all(query)
@@ -123,6 +134,10 @@ defmodule Pow.Postgres.Store do
 
   def filter_key(query, key) do
     where(query, [s], s.original_key == ^:erlang.term_to_binary(key))
+  end
+
+  def reject_expired(query) do
+    where(query, [s], is_nil(s.expires_at) or s.expires_at > ^DateTime.utc_now())
   end
 
   def decode_record({key, value}) do

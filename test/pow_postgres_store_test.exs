@@ -31,4 +31,13 @@ defmodule Pow.Postgres.StoreTest do
     assert :ok = Store.put(config, {"overwrite", :abc})
     assert :abc = Store.get(config, "overwrite")
   end
+
+  test "records expire if ttl option is set" do
+    config = [ttl: -5000] # negative ttl will immediately expire
+    assert :ok = Store.put(config, {"key", 10})
+    assert :not_found = Store.get(config, "key")
+    config = [ttl: 50_000]
+    assert :ok = Store.put(config, {"key", 20})
+    assert 20 = Store.get(config, "key")
+  end
 end
