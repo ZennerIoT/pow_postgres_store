@@ -5,14 +5,16 @@ defmodule Mix.Tasks.Pow.Postgres.Gen.Schema do
     datetime_type: :string,
     schema_name: :string,
     schema_module_name: :string,
-    module_prefix: :string
+    module_prefix: :string,
+    overwrite: :boolean
   ]
 
   @defaults [
     datetime_type: ":utc_datetime",
     schema_name: "pow_store",
     schema_module_name: "Schema",
-    module_prefix: "Pow.Postgres"
+    module_prefix: "Pow.Postgres",
+    overwrite: false
   ]
 
   require EEx
@@ -35,23 +37,50 @@ defmodule Mix.Tasks.Pow.Postgres.Gen.Schema do
     {options, [filename], errors} = OptionParser.parse(args, strict: @flags)
     assigns =
       Keyword.merge(@defaults, options)
+      |> Keyword.take([:datetime_type, :schema_name, :schema_module_name, :module_prefix])
       |> Enum.into(%{})
 
-    create_schema_file(assigns, filename)
+    create_schema_file(assigns, filename, options)
 
-    create_migrations(assigns)
+    create_migrations(assigns, options)
   end
 
-  def create_schema_file(assigns, filename) do
+  def create_schema_file(assigns, filename, options) do
     code = render_schema(assigns)
-    File.write!(filename, code)
+    write(filename, code, options)
   end
 
-  def create_migrations(assigns) do
+  def create_migrations(assigns, options) do
     File.mkdir_p!("priv/repo/migrations")
     for migration <- @migrations do
       code = apply(__MODULE__, migration.fun_name, [assigns])
-      File.write!(migration.target, code)
+      write(migration.target, code, options)
+    end
+  end
+
+  def write(filename, code, opts) do
+    if not File.exists?(filename) or Keyword.get(opts, :overwrite, false) do
+      File.write!(filename, code)
+      IO.puts [
+        IO.ANSI.green(),
+        " * Generated ",
+        IO.ANSI.reset(),
+        filename
+      ]
+    else
+      IO.puts [
+        IO.ANSI.red(),
+        " * Failed to generate ",
+        IO.ANSI.reset(),
+        filename,
+        IO.ANSI.red(),
+        " - this file already exists. Pass ",
+        IO.ANSI.reset(),
+        "--overwrite",
+        IO.ANSI.red(),
+        " to generate this file anyway.",
+        IO.ANSI.reset()
+      ]
     end
   end
 end

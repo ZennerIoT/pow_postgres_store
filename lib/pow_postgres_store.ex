@@ -61,6 +61,18 @@ defmodule Pow.Postgres.Store do
     end
   end
 
+  @spec delete_expired() :: :ok
+  def delete_expired() do
+    query =
+      schema()
+      |> filter_expired()
+
+    case repo().delete_all(query) do
+      {_rows, _} ->
+        :ok
+    end
+  end
+
   @spec get(Config.t(), key()) :: any() | :not_found
   def get(config, key) do
     query =
@@ -142,6 +154,10 @@ defmodule Pow.Postgres.Store do
 
   def reject_expired(query) do
     where(query, [s], is_nil(s.expires_at) or s.expires_at > ^DateTime.utc_now())
+  end
+
+  def filter_expired(query) do
+    where(query, [s], not is_nil(s.expires_at) and s.expires_at <= ^DateTime.utc_now())
   end
 
   def decode_record({key, value}) do

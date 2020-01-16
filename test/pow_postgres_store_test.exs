@@ -40,4 +40,11 @@ defmodule Pow.Postgres.StoreTest do
     assert :ok = Store.put(config, {"key", 20})
     assert 20 = Store.get(config, "key")
   end
+
+  test "deletes only expired records" do
+    assert :ok = Store.put([ttl: -5000], {:expired, 1})
+    assert :ok = Store.put([ttl: 5000], {:existing, 1})
+    assert :ok = Store.delete_expired()
+    assert 1 = Store.get([], :existing)
+  end
 end

@@ -12,7 +12,7 @@ defmodule PowPostgresStore.MixProject do
       aliases: [
         test: [
           # generate the schema to test if schema generation works
-          "pow.postgres.gen.schema test/support/schema.ex",
+          "pow.postgres.gen.schema --overwrite test/support/schema.ex",
           "ecto.drop",
           "ecto.create",
           "ecto.migrate",
