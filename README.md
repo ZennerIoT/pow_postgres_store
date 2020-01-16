@@ -39,4 +39,3 @@ and tell `pow` to use this library as the store:
 config :my_app, Pow,  
   cache_store_backend: Pow.Postgres.Store
 ```
-
