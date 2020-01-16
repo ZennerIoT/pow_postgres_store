@@ -9,7 +9,7 @@ First, add the dependency:
 ```elixir
 def deps do
   [
-    {:pow_postgres_store, "~> 0.1.0"}
+    {:pow_postgres_store, "~> 1.0"}
     # or 
     {:pow_postgres_store, github: "ZennerIoT/pow_postgres_store}
   ]
@@ -38,4 +38,14 @@ and tell `pow` to use this library as the store:
 ```elixir
 config :my_app, Pow,  
   cache_store_backend: Pow.Postgres.Store
+```
+
+To automatically delete expired records from the database table, add this somewhere in your supervision tree:
+
+```elixir
+children = [
+  #...
+  worker(Pow.Postgres.Store.AutoDeleteExpired, [[interval: :timer.hours(1)]]),
+  #...
+]
 ```
