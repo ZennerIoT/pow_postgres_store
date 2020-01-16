@@ -1,6 +1,7 @@
 defmodule <%= @module_prefix %>.<%= @schema_module_name %> do
   use Ecto.Schema
 
+  @primary_key false
   schema "<%= @schema_name %>" do
     field :namespace, :string
     field :key, {:array, :binary}

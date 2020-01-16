@@ -2,7 +2,7 @@ defmodule <%= @module_prefix %>.Repo.Migrations.CreateTablePowStore do
   use Ecto.Migration 
 
   def change do
-    create table("<%= @schema_name %>") do
+    create table("<%= @schema_name %>", primary_key: false) do
       add :namespace, :text
       add :key, {:array, :bytea}
       add :original_key, :bytea
