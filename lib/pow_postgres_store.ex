@@ -4,7 +4,7 @@ defmodule Pow.Postgres.Store do
   alias Pow.Config
   import Ecto.Query
 
-  @type key() :: [binary() | atom()] | binary()
+  @type key() :: [any()] | binary()
   @type record() :: {key(), any()}
   @type key_match() :: [atom() | binary()]
 
@@ -142,7 +142,7 @@ defmodule Pow.Postgres.Store do
         :_ ->
           query
 
-        key when is_atom(key) or is_binary(key) ->
+        key ->
           from s in query, where: fragment("?[?] = ?", s.key, ^index, ^:erlang.term_to_binary(key))
       end
     end)

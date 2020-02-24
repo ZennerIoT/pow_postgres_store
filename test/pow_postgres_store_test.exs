@@ -41,6 +41,16 @@ defmodule Pow.Postgres.StoreTest do
     assert 20 = Store.get(config, "key")
   end
 
+  test "integer keys" do
+    config = []
+    assert :ok = Store.put(config, {["users", 20, "struct"], %{name: "boo"}})
+    assert %{name: "boo"} = Store.get(config, ["users", 20, "struct"])
+
+    result = Store.all(config, ["users", 20, :_])
+    assert [{_, %{name: "boo"}}] = result
+
+  end
+
   test "deletes only expired records" do
     assert :ok = Store.put([ttl: -5000], {:expired, 1})
     assert :ok = Store.put([ttl: 5000], {:existing, 1})
