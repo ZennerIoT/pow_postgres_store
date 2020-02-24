@@ -4,7 +4,7 @@ defmodule PowPostgresStore.MixProject do
   def project do
     [
       app: :pow_postgres_store,
-      version: "1.0.0-rc1",
+      version: "1.0.0-rc2",
       elixir: "~> 1.9",
       start_permanent: Mix.env() == :prod,
       elixirc_paths: elixirc_paths(Mix.env),
