@@ -34,7 +34,7 @@ defmodule Mix.Tasks.Pow.Postgres.Gen.Schema do
   end
 
   def run(args) do
-    {options, [filename], errors} = OptionParser.parse(args, strict: @flags)
+    {options, [filename], _errors} = OptionParser.parse(args, strict: @flags)
     assigns =
       Keyword.merge(@defaults, options)
       |> Keyword.take([:datetime_type, :schema_name, :schema_module_name, :module_prefix])
