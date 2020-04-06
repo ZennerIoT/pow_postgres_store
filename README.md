@@ -45,7 +45,7 @@ To automatically delete expired records from the database table, add this somewh
 ```elixir
 children = [
   #...
-  worker(Pow.Postgres.Store.AutoDeleteExpired, [[interval: :timer.hours(1)]]),
+  {Pow.Postgres.Store.AutoDeleteExpired, [interval: :timer.hours(1)]},
   #...
 ]
 ```
