@@ -4,7 +4,7 @@ defmodule PowPostgresStore.MixProject do
   def project do
     [
       app: :pow_postgres_store,
-      version: "1.0.0-rc2",
+      version: "1.0.0",
       elixir: "~> 1.9",
       start_permanent: Mix.env() == :prod,
       elixirc_paths: elixirc_paths(Mix.env),
@@ -38,7 +38,7 @@ defmodule PowPostgresStore.MixProject do
       {:pow, ">= 1.0.0"},
       {:ecto_sql, ">= 3.0.0"},
       {:postgrex, "~> 0.15.3", only: :test},
-      {:ex_doc, "~> 0.14", only: :dev, runtime: false}
+      {:ex_doc, "> 0.0.0", only: :dev, runtime: false}
     ]
   end
 
